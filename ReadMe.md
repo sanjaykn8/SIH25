@@ -102,6 +102,38 @@ Battery Li-ion(12v 5Ah) : ~1500
 
 *Decent specs = ~17k*
 
+
+
+**Tips**
+
+1. Always capture dark frames and reference (blank water) frames for each measurement to cancel ambient and lamp drift.
+
+2. Use band-pass emission filters for fluorescence imaging (blocks excitation light).
+
+3. Use short pulsed illumination and synchronized capture to increase SNR.
+
+4. Create a controlled training dataset: multiple polymer types, sizes, pigments, and aged/biofouled samples. Real-world noise is the killer.
+
+5. For ML labels, pair your multispectral+camera readings with corresponding FTIR/Raman lab-confirmed labels.
+
+
+
+**To-Do**
+
+1. Automatic Hardware Checking
+
+Install a flow sensor before the chamber and compare actual vs expected flow to detect leaks or blockages. Place a reference LED–photodiode pair inside to measure baseline light transmission, and run a self-test by shining the LED onto a white/PTFE patch for calibration. ESP32-S3 runs a loop comparing these signals to thresholds; if deviation persists, it raises a hardware error and sends an app alert.
+
+2. Auto-Cleaning with Ionized Water
+
+Use a 3-way solenoid valve to switch between sample water and a cleaning tank. During cleaning mode, a pump flushes the chamber with ionized or UV-treated water (produced via electrolysis plates or stored cartridge) while a UV-C LED sterilizes the flow path. After flushing, the system records a blank baseline to reset measurements automatically.
+
+3. Plastic Concentration Alert System
+
+Measure scattering + absorption features and feed them into a TinyML model to estimate plastic concentration (ppm). If values exceed a set threshold, ESP32-S3 sends data via Wi-Fi/BLE to Firebase/InfluxDB, which triggers a push notification on the mobile app. The app shows real-time concentration graphs, alerts, and historical trends for monitoring.
+
+
+
 **Must Include References***(Given Datasets)*
 
 1. Stressor-AOP : https://cb.imsc.res.in/saopadditives/
