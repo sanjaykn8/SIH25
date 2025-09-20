@@ -9,6 +9,8 @@ import 'dart:async';
 import 'dart:ui';
 
 class EnhancedLoginScreen extends StatefulWidget {
+  const EnhancedLoginScreen({super.key});
+
   @override
   _EnhancedLoginScreenState createState() => _EnhancedLoginScreenState();
 }
@@ -217,12 +219,12 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
   }
 
   void _setupFocusListeners() {
-    [
+    for (var focus in [
       _usernameFocus,
       _emailFocus,
       _passwordFocus,
       _confirmPasswordFocus,
-    ].forEach((focus) {
+    ]) {
       focus.addListener(() {
         if (mounted) {
           if (focus.hasFocus) {
@@ -232,7 +234,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
           }
         }
       });
-    });
+    }
   }
 
   Future<void> _loadRememberMeState() async {
@@ -342,7 +344,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
         Navigator.pushReplacementNamed(context, '/dashboard');
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -366,11 +368,11 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
       String email = _emailController.text.trim();
 
       // Create user account with Firebase Auth
-      UserCredential userCredential = await _auth
-          .createUserWithEmailAndPassword(
-            email: email,
-            password: _passwordController.text,
-          );
+      UserCredential userCredential =
+          await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: _passwordController.text,
+      );
 
       // Check if user creation was successful
       if (userCredential.user == null) {
@@ -404,7 +406,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
         Navigator.pushReplacementNamed(context, '/dashboard');
       }
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
@@ -440,8 +442,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
         return;
       }
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -459,8 +460,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
       }
 
       // Generate unique username from display name
-      String baseUsername =
-          userCredential.user!.displayName
+      String baseUsername = userCredential.user!.displayName
               ?.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '')
               .toLowerCase() ??
           userCredential.user!.email!
@@ -774,8 +774,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
                               return Transform.translate(
                                 offset: Offset(0, _formSlideAnimation.value),
                                 child: Opacity(
-                                  opacity:
-                                      _formFadeAnimation.value *
+                                  opacity: _formFadeAnimation.value *
                                       (1 -
                                           _modeTransitionAnimation.value * 0.3),
                                   child: ClipRRect(
@@ -916,7 +915,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
                                                       _obscureConfirmPassword
                                                           ? Icons.visibility
                                                           : Icons
-                                                                .visibility_off,
+                                                              .visibility_off,
                                                       color: Colors.white
                                                           .withOpacity(0.7),
                                                     ),
@@ -1026,9 +1025,8 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
                     color: _isLoginMode
                         ? Colors.white
                         : Colors.white.withOpacity(0.7),
-                    fontWeight: _isLoginMode
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    fontWeight:
+                        _isLoginMode ? FontWeight.bold : FontWeight.normal,
                     fontSize: 16,
                   ),
                 ),
@@ -1058,9 +1056,8 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
                     color: !_isLoginMode
                         ? Colors.white
                         : Colors.white.withOpacity(0.7),
-                    fontWeight: !_isLoginMode
-                        ? FontWeight.bold
-                        : FontWeight.normal,
+                    fontWeight:
+                        !_isLoginMode ? FontWeight.bold : FontWeight.normal,
                     fontSize: 16,
                   ),
                 ),
@@ -1205,7 +1202,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
     return AnimatedSwitcher(
       duration: Duration(milliseconds: 400),
       child: Column(
-        key: ValueKey('${_errorMessage}_${_successMessage}'),
+        key: ValueKey('${_errorMessage}_$_successMessage'),
         children: [
           if (_errorMessage.isNotEmpty)
             Container(
@@ -1414,7 +1411,7 @@ class _EnhancedLoginScreenState extends State<EnhancedLoginScreen>
   }
 
   Widget _buildGoogleSignInButton() {
-    return Container(
+    return SizedBox(
       width: double.infinity,
       height: 56,
       child: OutlinedButton(
@@ -1552,13 +1549,13 @@ class CreativeParticlePainter extends CustomPainter {
 
     for (var particle in particles) {
       final currentY = (particle.y + animationValue * particle.speed) % 1.0;
-      final currentX =
-          particle.x +
+      final currentX = particle.x +
           sin(animationValue * 2 * pi * particle.oscillation + particle.phase) *
               0.08;
 
-      if (currentX < 0 || currentX > 1 || currentY < 0 || currentY > 1)
+      if (currentX < 0 || currentX > 1 || currentY < 0 || currentY > 1) {
         continue;
+      }
 
       final paint = Paint()
         ..color = particle.color
@@ -1596,8 +1593,9 @@ class FloatingElementPainter extends CustomPainter {
       final currentX =
           element.x + sin(animationValue * 2 * pi * 0.3 + element.y * 8) * 0.04;
 
-      if (currentX < 0 || currentX > 1 || currentY < 0 || currentY > 1)
+      if (currentX < 0 || currentX > 1 || currentY < 0 || currentY > 1) {
         continue;
+      }
 
       canvas.save();
       canvas.translate(currentX * size.width, currentY * size.height);
