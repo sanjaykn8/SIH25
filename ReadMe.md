@@ -3,18 +3,18 @@
 **Steps**
 
 1. Pass water through a narrow ledge (preprocess if needed)
-2. Shine controlled light (blue/UV or visible) on it
+2. Shine controlled light (1 W white LED) on it
 3. Read the light using small spectrometer + camera
 4. Analyse: *plastic or not*
 
 **Working**
 
-1. Water enters ***dark chamber***
+1. Water enters **dark chamber**
 2. Filtering (membrane or cuvette)
 3. Light is passed (controlled, repeatable illumination)
 4. Stain or optical response is formed as a spectrum / image
-5. **Spectrum is captured using *AS7265x*** and image is captured using **ESP32-S3** (camera)
-6. **Wi‑Fi / Bluetooth** is used to stream data to a mobile app / backend
+5. **Spectrum is captured using AS7265x** and image is captured using **ESP32-CAM (OV2640)**
+6. **Wi‑Fi** is used to stream data to a mobile app / backend
 
 **Arrangement**
 
@@ -30,7 +30,7 @@
 
 **Architecture**
 
-1. **ML model** : *1D‑CNN (preferred)* or *Random Forest*
+1. **ML model** : *CNN*
 
    * **Written in:** *TensorFlow*
    * **Converted to:** *TFLite*
@@ -40,7 +40,8 @@
 
    * **ESP32‑S3 (N16R8 recommended)** — Wi‑Fi, PSRAM for camera buffering and TinyML
    * **AS7265x** — 18‑channel multispectral sensor (410–940 nm) *(this project uses AS7265x only)*
-   * **OV2640** camera (or camera on ESP32 devboard)
+   * **ESP32‑CAM (OV2640)** camera module (or OV2640 mounted on compatible board)
+   * **1 W white LED** (controlled illumination)
    * **A box** — dark enclosure for optics
 
 3. **TechStack** :
@@ -53,7 +54,7 @@
 **Problems**
 
 1. **Camera:** low‑cost camera without magnification cannot reliably resolve **10–50 µm** — magnification or microscope objective required
-2. **Nile Red staining:** useful for fluorescence screening but can cause false positives with organics
+2. **Nile Red staining:** useful for fluorescence screening but can cause false positives with organics. Note: fluorescence workflows typically require UV or narrowband excitation and optical filtering. Using a white LED limits fluorescence sensitivity.
 3. **Battery:** ensure safe, long runtime (BMS, fusing, regulators)
 4. **Data:** field samples are noisy — collect diverse, real labeled data early
 5. **Plastic class:** FTIR/Raman remains the gold standard for polymer confirmation (use for validation)
@@ -62,10 +63,10 @@
 
 * ESP32‑S3 : \~₹2,000
 * AS7265x : \~₹9,000
-* UV LED (365–405 nm) : \~₹1,000
+* 1W white LED : \~₹1,000
 * Battery Li‑ion (12 V, 5 Ah) : \~₹1,500
 
-**=> Decent specs ≈ ₹17,000**
+**=> Decent specs ≈ ₹13,500**
 
 **Tips**
 
@@ -97,8 +98,8 @@
 
 **What I used (current hardware inventory)**
 
-* **ESP32‑S3 N16R8 (DevKit)** — main MCU, camera, Wi‑Fi, PSRAM for buffering
-* **OV2640** camera module (mounted or onboard)
+* **ESP32‑S3 N16R8 (DevKit)** — main MCU, Wi‑Fi, PSRAM for buffering and TinyML
+* **ESP32‑CAM (OV2640)** — camera module
 * **1 W white LED** (visible; for reflectance/scattering testing)
 * **Logic MOSFET** for LED PWM switching
 * **16 GB microSD card** for local logging
@@ -111,14 +112,13 @@
 
 * **Calibration flow:** dark frame → white (PTFE) reference → sample capture. Save all three files with timestamps and metadata (location, sample volume, illumination, exposure).
 * **Preprocessing:** baseline subtraction (dark), reference division (normalize), low‑pass smoothing, and per‑channel scaling.
-* **Model inputs:** spectral vector (18 channels) + image crops (localized particles) → decision fusion (1D‑CNN + small CNN).
+* **Model inputs:** spectral vector (18 channels) + image crops (localized particles) → decision fusion (CNN + small CNN for images).
 * **Evaluation:** Precision/Recall for "microplastic" vs "non‑plastic"; confusion matrix for polymer class; size estimation MSE; FTIR validation on subset.
 
 **Safety & lab notes**
 
-* **Nile Red:** handle with PPE, avoid field use unless trained; dispose stain waste properly.
 * **Batteries:** use BMS, fuse, and safe charging procedures.
-* **UV LEDs:** use eye/skin protection if used; prefer visible white LED for reflectance testing.
+* **LEDs:** bright LEDs can damage eyes. Use eye protection for high‑intensity sources.
 
 **References / Datasets**
 
@@ -127,3 +127,11 @@
 3. Marine Debris Program : [https://marinedebris.noaa.gov/](https://marinedebris.noaa.gov/)
 
 ---
+
+*Changes made in this version:*
+
+* Replaced UV illumination with a 1 W white LED.
+* Replaced "1D‑CNN" with "CNN".
+* Removed Random Forest from modelling options.
+* Removed Bluetooth. System uses Wi‑Fi only.
+* Explicit camera hardware set to ESP32‑CAM (OV2640).
